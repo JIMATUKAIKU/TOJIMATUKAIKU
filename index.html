@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tryout JIMAT UKAI - Simulasi 100 Soal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #fff, #ffc0cb, #d2b48c);
+      padding: 20px;
+    }
+    .question-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .navigation {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    .navigation button {
+      padding: 5px 10px;
+      border: none;
+      background-color: #d2b48c;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .navigation button.active {
+      background-color: #ff69b4;
+    }
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #c00;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Tryout JIMAT UKAI - Simulasi 100 Soal</h2>
+<div id="timer">Sisa Waktu: 100:00</div>
+<div class="navigation" id="nav"></div>
+
+<div class="question-box">
+  <div id="question-text"></div>
+  <div id="options"></div>
+</div>
+
+<button onclick="prevQuestion()">Sebelumnya</button>
+<button onclick="nextQuestion()">Berikutnya</button>
+<button onclick="submitAnswers()">Selesai</button>
+
+<div id="result"></div>
+
+<script>
+  const questions = [
+    {
+      question: "1. Obat A memiliki bioavailabilitas 80% dan waktu paruh 6 jam. Apa arti dari bioavailabilitas tersebut?",
+      options: ["Tingkat pengikatan protein", "Jumlah yang diabsorpsi", "Persentase yang mencapai sirkulasi sistemik", "Jumlah obat yang diubah hati"],
+      answer: 2
+    },
+    {
+      question: "2. Seorang pasien mengalami diare setelah konsumsi antibiotik. Apa kemungkinan penyebabnya?",
+      options: ["Infeksi virus", "Resistensi obat", "Disbiosis usus", "Dehidrasi"],
+      answer: 2
+    },
+    // Tambahkan soal hingga 100 di sini
+  ];
+
+  let currentQuestion = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+
+  function renderQuestion(index) {
+    document.getElementById('question-text').innerText = questions[index].question;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    questions[index].options.forEach((opt, i) => {
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'option';
+      radio.value = i;
+      radio.checked = userAnswers[index] === i;
+      radio.onclick = () => userAnswers[index] = i;
+
+      const label = document.createElement('label');
+      label.textContent = opt;
+      label.style.display = 'block';
+      label.prepend(radio);
+
+      optionsDiv.appendChild(label);
+    });
+
+    document.querySelectorAll('.navigation button').forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
+    });
+  }
+
+  function renderNavigation() {
+    const nav = document.getElementById('nav');
+    nav.innerHTML = '';
+    questions.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = i + 1;
+      btn.onclick = () => {
+        currentQuestion = i;
+        renderQuestion(currentQuestion);
+      };
+      nav.appendChild(btn);
+    });
+  }
+
+  function prevQuestion() {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      renderQuestion(currentQuestion);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentQuestion < questions.length - 1) {
+      currentQuestion++;
+      renderQuestion(currentQuestion);
+    }
+  }
+
+  function submitAnswers() {
+    let score = 0;
+    questions.forEach((q, i) => {
+      if (userAnswers[i] === q.answer) score++;
+    });
+    const nilai = Math.round((score / questions.length) * 100);
+    document.getElementById('result').innerHTML = `
+      <h3>Skor Anda: ${nilai}</h3>
+      <p>${nilai >= 65 ? '✅ LULUS' : '❌ TIDAK LULUS'} (Minimal 65)</p>
+      <p>Jawaban Benar: ${score} dari ${questions.length}</p>
+    `;
+  }
+
+  // Timer
+  let totalSeconds = 100 * 60;
+  const timer = setInterval(() => {
+    totalSeconds--;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    document.getElementById('timer').innerText = `Sisa Waktu: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (totalSeconds <= 0) {
+      clearInterval(timer);
+      submitAnswers();
+      alert('Waktu habis!');
+    }
+  }, 1000);
+
+  // Inisialisasi
+  renderNavigation();
+  renderQuestion(currentQuestion);
+</script>
+
+</body>
+</html>
