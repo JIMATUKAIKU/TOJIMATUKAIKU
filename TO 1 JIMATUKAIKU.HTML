@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tryout JIMAT UKAI - Simulasi 100 Soal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #fff, #ffc0cb, #d2b48c);
+      padding: 20px;
+    }
+    .question-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .navigation {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    .navigation button {
+      padding: 5px 10px;
+      border: none;
+      background-color: #d2b48c;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .navigation button.active {
+      background-color: #ff69b4;
+    }
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #c00;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Tryout JIMAT UKAI - Simulasi 100 Soal</h2>
+<div id="timer">Sisa Waktu: 100:00</div>
+<div class="navigation" id="nav"></div>
+
+<div class="question-box">
+  <div id="question-text"></div>
+  <div id="options"></div>
+</div>
+
+<button onclick="prevQuestion()">Sebelumnya</button>
+<button onclick="nextQuestion()">Berikutnya</button>
+<button onclick="submitAnswers()">Selesai</button>
+
+<div id="result"></div>
+
+<script>
+  const questions = [
+    {
+      question: "1. Seorang pasien wanita 58 tahun mengalami hipertensi dan sedang mengonsumsi amlodipin 10 mg sekali sehari. Ia mengeluhkan bengkak pada pergelangan kaki. Apa penyebab paling mungkin dari efek samping ini?",
+      options: ["Retensi natrium", "Vasodilatasi arteriol perifer", "Efek antidiuretik", "Aktivasi sistem RAA", "Reaksi alergi"],
+      answer: 1
+    },
+    {
+      question: "2. Sediaan parenteral harus steril dan bebas dari partikel. Salah satu metode sterilisasi yang digunakan untuk sediaan termosensitif adalah:",
+      options: ["Autoklaf", "Sinar gamma", "Filtrasi", "Sinar UV", "Pemanasan kering"],
+      answer: 2
+    },
+    {
+      question: "3. Pasien anak dengan infeksi saluran kemih diberi terapi antibiotik oral. Dokter memilih sirup trimetoprim-sulfametoksazol. Apa alasan farmasetik memilih bentuk sirup?",
+      options: ["Mempercepat onset", "Memperbaiki kelarutan", "Memudahkan pemberian dan akseptabilitas", "Menurunkan efek samping", "Meningkatkan waktu paruh"],
+      answer: 2
+    },
+    {
+      question: "4. Apa efek pemberian bersamaan warfarin dengan metronidazole?",
+      options: ["Penurunan efek antikoagulan", "Tidak ada interaksi", "Peningkatan risiko perdarahan", "Peningkatan metabolisme warfarin", "Efek antagonis terhadap vitamin K"],
+      answer: 2
+    },
+    {
+      question: "5. Seorang pasien mendapat dosis insulin reguler subkutan sebelum makan. Kapan waktu terbaik penyuntikan agar sesuai waktu puncak kerja insulin?",
+      options: ["5 menit sebelum makan", "Sesaat setelah makan", "30 menit sebelum makan", "1 jam sebelum makan", "Setelah makan malam"],
+      answer: 2
+    },
+    {
+      question: "6. Pernyataan benar terkait bioavailabilitas mutlak adalah:",
+      options: ["Dibandingkan dengan sediaan IM", "Persentase obat yang mencapai hati", "Rasio AUC oral dan IV", "Dihitung dari laju eliminasi", "Mewakili kelarutan obat"],
+      answer: 2
+    },
+    {
+      question: "7. Sediaan suppositoria rektal memiliki keuntungan berikut, kecuali:",
+      options: ["Menghindari first-pass effect", "Cocok untuk pasien muntah", "Onset cepat", "Absorpsi konsisten", "Mudah diberikan pada anak"],
+      answer: 3
+    },
+    {
+      question: "8. Antibiotik berikut efektif melawan Pseudomonas aeruginosa, kecuali:",
+      options: ["Piperasilin", "Cefepime", "Meropenem", "Amoksisilin", "Ceftazidime"],
+      answer: 3
+    },
+    {
+      question: "9. Bahan pengikat (binder) pada tablet berfungsi untuk:",
+      options: ["Menarik air", "Menghambat pelepasan", "Menyatu partikel menjadi granul", "Memecah tablet", "Meningkatkan rasa"],
+      answer: 2
+    },
+    {
+      question: "10. Dokter memberikan allopurinol pada pasien asam urat. Obat ini bekerja dengan cara:",
+      options: ["Menghambat pembentukan urat", "Meningkatkan ekskresi urat", "Menurunkan inflamasi", "Meningkatkan metabolisme purin", "Menghambat ginjal"],
+      answer: 0
+    }
+    
+,
+    {
+      question: "11. Seorang pasien menjalani pengobatan TB dengan regimen 2HRZE/4HR. Setelah 2 bulan, pemeriksaan fungsi hati menunjukkan SGOT/SGPT meningkat 3x lipat. Apa tindakan pertama?",
+      options: ["Ganti rifampisin dengan levofloxacin", "Hentikan semua obat anti-TB", "Lanjutkan terapi dan evaluasi ulang", "Ganti isoniazid dengan etambutol", "Tambahkan hepatoprotektor"],
+      answer: 2
+    },
+    {
+      question: "12. Pasien lansia mengalami nyeri osteoartritis kronis. Obat antiinflamasi yang paling aman untuk pasien dengan risiko gastrointestinal tinggi adalah:",
+      options: ["Ibuprofen", "Aspirin", "Diclofenac", "Celecoxib", "Meloxicam"],
+      answer: 3
+    },
+    {
+      question: "13. Vitamin yang penting dalam reaksi karboksilasi dan digunakan sebagai koenzim adalah:",
+      options: ["Vitamin C", "Vitamin K", "Vitamin B1", "Vitamin D", "Vitamin B7"],
+      answer: 4
+    },
+    {
+      question: "14. Pasien keracunan asetaminofen akut. Terapi penawarnya adalah:",
+      options: ["Atropin", "Flumazenil", "Acetylcysteine", "Deferoksamin", "Pralidoksim"],
+      answer: 2
+    },
+    {
+      question: "15. Senyawa berikut ini adalah eksipien pengemulsi yang umum digunakan dalam emulsi oral, kecuali:",
+      options: ["Span 80", "Tween 80", "Gliserol", "Lesitin", "Sodium lauril sulfat"],
+      answer: 2
+    },
+    {
+      question: "16. Metode evaluasi ukuran partikel mikro atau nanopartikel yang paling akurat:",
+      options: ["Mikroskop cahaya", "Sentrifugasi", "Laser diffraction", "Titrasi", "Filtrasi"],
+      answer: 2
+    },
+    {
+      question: "17. Kombinasi amoksisilin dengan asam klavulanat bertujuan untuk:",
+      options: ["Mengurangi dosis", "Mempercepat onset", "Menghambat enzim beta-laktamase", "Meningkatkan ekskresi", "Menurunkan efek samping"],
+      answer: 2
+    },
+    {
+      question: "18. Obat golongan benzodiazepin bekerja dengan cara:",
+      options: ["Aktivasi kanal kalsium", "Inhibisi kanal natrium", "Agonis GABA-A", "Antagonis NMDA", "Antagonis dopamin"],
+      answer: 2
+    },
+    {
+      question: "19. Etika profesi apoteker melarang keras:",
+      options: ["Promosi obat generik", "Konseling pasien", "Pemberian diskon", "Penulisan resep sendiri", "Praktik interdisipliner"],
+      answer: 3
+    },
+    {
+      question: "20. Pasien yang menerima gentamisin harus dimonitor:",
+      options: ["Tekanan darah", "Fungsi hati", "Fungsi ginjal dan pendengaran", "Hemoglobin", "Kadar glukosa"],
+      answer: 2
+    },
+    {
+      question: "21. Sediaan tetes mata harus memiliki karakteristik berikut, kecuali:",
+      options: ["Steril", "Isotonis", "pH sesuai mata", "Mengandung zat warna", "Mengandung antimikroba"],
+      answer: 3
+    },
+    {
+      question: "22. Obat berikut yang paling tepat untuk pasien asma akut berat adalah:",
+      options: ["Salbutamol inhalasi", "Salbutamol oral", "Teofilin", "Ketotifen", "Salbutamol SR"],
+      answer: 0
+    },
+    {
+      question: "23. Efek samping khas dari penggunaan jangka panjang kortikosteroid sistemik:",
+      options: ["Hipotensi", "Katarak", "Hipoglikemia", "Penurunan nafsu makan", "Rambut rontok"],
+      answer: 1
+    },
+    {
+      question: "24. Obat antiemetik yang bekerja sebagai antagonis reseptor serotonin 5-HT3:",
+      options: ["Metoklopramid", "Ondansetron", "Domperidon", "Deksametason", "Siklizine"],
+      answer: 1
+    },
+    {
+      question: "25. Pasien diabetes dengan nefropati, obat antihipertensi yang direkomendasikan:",
+      options: ["Propranolol", "Amlodipin", "Kaptopril", "Hidroklorotiazid", "Nifedipin"],
+      answer: 2
+    },
+    {
+      question: "26. Indikasi penggunaan protamin sulfat adalah keracunan:",
+      options: ["Warfarin", "Aspirin", "Heparin", "Streptokinase", "Dabigatran"],
+      answer: 2
+    },
+    {
+      question: "27. Sediaan farmasi berikut merupakan bentuk modified release, kecuali:",
+      options: ["Tablet SR", "Tablet ER", "Tablet DR", "Tablet dispersible", "Tablet CR"],
+      answer: 3
+    },
+    {
+      question: "28. Golongan obat berikut yang bekerja sebagai inhibitor pompa proton:",
+      options: ["Ranitidin", "Metoklopramid", "Omeprazol", "Aluminium hidroksida", "Misoprostol"],
+      answer: 2
+    },
+    {
+      question: "29. Jenis interaksi farmakokinetik yang mempengaruhi distribusi obat:",
+      options: ["Kompetisi pengikatan protein plasma", "Peningkatan eliminasi", "Penghambatan absorpsi", "Induksi enzim CYP450", "Inhibisi ekskresi ginjal"],
+      answer: 0
+    },
+    {
+      question: "30. Obat yang dapat menyebabkan hiperplasia gingiva:",
+      options: ["Fenitoin", "Amlodipin", "Diazepam", "Lidokain", "Amoksisilin"],
+      answer: 0
+    },
+    {
+      question: "31. Obat pilihan pertama untuk status epileptikus adalah:",
+      options: ["Fenitoin", "Asam valproat", "Diazepam", "Fenobarbital", "Levetirasetam"],
+      answer: 2
+    },
+    {
+      question: "32. Zat aditif yang berfungsi sebagai pengisi dalam tablet adalah:",
+      options: ["Laktosa", "PVP", "Talc", "Magnesium stearat", "Natrium benzoat"],
+      answer: 0
+    },
+    {
+      question: "33. Obat berikut termasuk golongan antipsikotik atipikal:",
+      options: ["Klorpromazin", "Haloperidol", "Risperidon", "Fluoksetin", "Diazepam"],
+      answer: 2
+    },
+    {
+      question: "34. Sediaan farmasi yang memiliki dua fase cair tidak saling melarutkan disebut:",
+      options: ["Suspensi", "Larutan", "Emulsi", "Aerosol", "Gel"],
+      answer: 2
+    },
+    {
+      question: "35. Obat yang dapat menurunkan ambang rangsang kejang adalah:",
+      options: ["Klorpromazin", "Amitriptilin", "Kafein", "Tramadol", "Semua benar"],
+      answer: 4
+    },
+    {
+      question: "36. Pasien dengan gangguan tiroid hipofungsi diberikan:",
+      options: ["PTU", "Levotiroksin", "Metimazol", "Tiamazol", "Yodium radioaktif"],
+      answer: 1
+    },
+    {
+      question: "37. Sediaan topikal dengan dasar hidrokarbon dan bersifat oklusif adalah:",
+      options: ["Krim", "Gel", "Pasta", "Salep", "Losion"],
+      answer: 3
+    },
+    {
+      question: "38. Antibiotik golongan makrolida bekerja dengan menghambat:",
+      options: ["Sintesis dinding sel", "Sintesis protein ribosom 30S", "Sintesis asam nukleat", "Sintesis protein ribosom 50S", "Metabolisme folat"],
+      answer: 3
+    },
+    {
+      question: "39. Obat pilihan untuk mengatasi hiperkalemia berat:",
+      options: ["Natrium bikarbonat", "Garam kalsium IV", "Insulin + glukosa", "Furosemid", "Semua benar"],
+      answer: 4
+    },
+    {
+      question: "40. Jenis pelarut yang digunakan dalam formulasi injeksi larutan minyak:",
+      options: ["Propilen glikol", "Etanol", "Minyak wijen", "Air untuk injeksi", "PEG 400"],
+      answer: 2
+    },
+    {
+      question: "41. Obat yang digunakan untuk mengobati hipotiroidisme:",
+      options: ["Metimazol", "Propiltiourasil", "Levotiroksin", "Yodium radioaktif", "Amiodaron"],
+      answer: 2
+    },
+    {
+      question: "42. Antikoagulan yang bekerja sebagai inhibitor langsung trombin:",
+      options: ["Warfarin", "Heparin", "Dabigatran", "Rivaroksaban", "Apiksaban"],
+      answer: 2
+    },
+    {
+      question: "43. Antibiotik yang bekerja dengan menghambat sintesis dinding sel:",
+      options: ["Tetrasiklin", "Makrolida", "Penisilin", "Aminoglikosida", "Kloramfenikol"],
+      answer: 2
+    },
+    {
+      question: "44. Obat pilihan untuk nyeri neuropatik:",
+      options: ["Parasetamol", "Ibuprofen", "Gabapentin", "Asam mefenamat", "Morfin"],
+      answer: 2
+    },
+    {
+      question: "45. Tujuan dari bioekuivalensi dalam uji generik:",
+      options: ["Menilai toksisitas", "Menilai stabilitas", "Membandingkan efikasi klinis", "Membandingkan AUC dan Cmax", "Menguji kelarutan"],
+      answer: 3
+    },
+    {
+      question: "46. Obat yang digunakan sebagai antidotum keracunan morfin:",
+      options: ["Atropin", "Nalokson", "Flumazenil", "N-asetilsistein", "Vitamin K"],
+      answer: 1
+    },
+    {
+      question: "47. Salah satu kelebihan suppositoria dibanding tablet oral:",
+      options: ["Absorpsi lebih cepat", "Menghindari lintasan hati pertama", "Lebih stabil", "Lebih murah", "Lebih mudah dibuat"],
+      answer: 1
+    },
+    {
+      question: "48. Obat golongan SSRI yang digunakan untuk depresi:",
+      options: ["Amitriptilin", "Fluoksetin", "Diazepam", "Haloperidol", "Klorpromazin"],
+      answer: 1
+    },
+    {
+      question: "49. Obat yang dapat menyebabkan batuk kering sebagai efek samping:",
+      options: ["Amlodipin", "Losartan", "Kaptopril", "Propranolol", "Hidroklorotiazid"],
+      answer: 2
+    },
+    {
+      question: "50. Bahan penghancur (disintegran) dalam tablet berfungsi untuk:",
+      options: ["Menarik air agar tablet hancur", "Mengikat partikel menjadi granul", "Melindungi bahan aktif", "Menambah rasa", "Memberi warna"],
+      answer: 0
+    },
+    {
+      question: "51. Obat yang digunakan sebagai profilaksis migrain:",
+      options: ["Ibuprofen", "Propranolol", "Sumatriptan", "Parasetamol", "Kodein"],
+      answer: 1
+    },
+    {
+      question: "52. Agen anestesi lokal yang umum digunakan dalam praktek kedokteran gigi:",
+      options: ["Bupivakain", "Lidokain", "Prokain", "Tetrakain", "Artikain"],
+      answer: 1
+    },
+    {
+      question: "53. Mekanisme kerja digoksin adalah:",
+      options: ["Blokade kanal kalsium", "Inhibitor enzim fosfodiesterase", "Inhibitor Na+/K+ ATPase", "Agonis beta-adrenergik", "Inhibitor ACE"],
+      answer: 2
+    },
+    {
+      question: "54. Obat yang digunakan untuk menurunkan tekanan intraokular pada glaukoma:",
+      options: ["Pilokarpin", "Atropin", "Fenilefrin", "Timolol", "Latanoprost"],
+      answer: 4
+    },
+    {
+      question: "55. Efek samping utama aminoglikosida:",
+      options: ["Hepatotoksisitas", "Ototoksisitas", "Hipertensi", "Hipokalemia", "Hiperglikemia"],
+      answer: 1
+    },
+    {
+      question: "56. Obat yang dikontraindikasikan pada kehamilan trimester pertama:",
+      options: ["Asetaminofen", "Amoksisilin", "Asam mefenamat", "Asam folat", "Insulin"],
+      answer: 2
+    },
+    {
+      question: "57. Fungsi utama surfaktan dalam formulasi farmasi:",
+      options: ["Mengawetkan sediaan", "Meningkatkan rasa", "Menurunkan tegangan permukaan", "Menstabilkan pH", "Mengatur viskositas"],
+      answer: 2
+    },
+    {
+      question: "58. Sediaan transdermal bertujuan untuk:",
+      options: ["Menurunkan onset kerja", "Menghindari efek samping lokal", "Menghindari lintasan hati pertama", "Meningkatkan rasa", "Meningkatkan ekskresi"],
+      answer: 2
+    },
+    {
+      question: "59. Obat pilihan untuk pasien dengan gangguan fungsi hati dan hipertensi:",
+      options: ["Kaptopril", "Atenolol", "Verapamil", "Lisinopril", "Propranolol"],
+      answer: 1
+    },
+    {
+      question: "60. Salah satu kelebihan sediaan lepas lambat:",
+      options: ["Meningkatkan dosis", "Mengurangi frekuensi pemberian", "Meningkatkan bioavailabilitas", "Menurunkan eliminasi", "Mengurangi volume distribusi"],
+      answer: 1
+    },
+    {
+      question: "61. Obat pilihan untuk status asma berat yang tidak responsif terhadap agonis beta-2 inhalasi:",
+      options: ["Teofilin", "Prednison oral", "Metilprednisolon IV", "Ketotifen", "Montelukast"],
+      answer: 2
+    },
+    {
+      question: "62. Antibiotik yang bekerja menghambat sintesis folat bakteri:",
+      options: ["Amoksisilin", "Kloramfenikol", "Siprofloksasin", "Sulfametoksazol", "Rifampisin"],
+      answer: 3
+    },
+    {
+      question: "63. Sediaan farmasi yang terdiri dari sistem dua fase padat dalam cair disebut:",
+      options: ["Larutan", "Suspensi", "Emulsi", "Aerosol", "Gel"],
+      answer: 1
+    },
+    {
+      question: "64. Obat yang dapat menyebabkan efek samping ginekomastia:",
+      options: ["Spironolakton", "Furosemid", "Hidroklorotiazid", "Amlodipin", "Metoprolol"],
+      answer: 0
+    },
+    {
+      question: "65. Mekanisme kerja asam asetilsalisilat sebagai antiplatelet:",
+      options: ["Menghambat sintesis tromboksan A2", "Menghambat COX-2 secara selektif", "Menghambat ADP", "Agonis reseptor prostasiklin", "Inhibitor GP IIb/IIIa"],
+      answer: 0
+    },
+    {
+      question: "66. Obat berikut yang termasuk beta blocker selektif:",
+      options: ["Propranolol", "Atenolol", "Labetalol", "Karvedilol", "Timolol"],
+      answer: 1
+    },
+    {
+      question: "67. Obat berikut yang dikontraindikasikan pada ulkus peptikum aktif:",
+      options: ["Ranitidin", "Omeprazol", "Asam mefenamat", "Sukralfat", "Antasida"],
+      answer: 2
+    },
+    {
+      question: "68. Sediaan yang cocok untuk pasien dengan kesulitan menelan dan butuh kerja cepat:",
+      options: ["Tablet salut selaput", "Tablet lepas lambat", "Tablet hisap", "Tablet disintegrasi oral", "Tablet effervescent"],
+      answer: 3
+    },
+    {
+      question: "69. Obat golongan sulfonilurea generasi kedua:",
+      options: ["Glibenklamid", "Metformin", "Akarbosa", "Sitagliptin", "Insulin glargin"],
+      answer: 0
+    },
+    {
+      question: "70. Antihipertensi yang juga bermanfaat untuk pasien dengan hipertrofi ventrikel kiri:",
+      options: ["Nifedipin", "Hidroklorotiazid", "Kaptopril", "Prazosin", "Atenolol"],
+      answer: 2
+    },
+    {
+      question: "71. Obat yang digunakan untuk mencegah infeksi Pneumocystis jirovecii pada pasien HIV:",
+      options: ["Amoksisilin", "Seftriakson", "Trimetoprim-sulfametoksazol", "Metronidazol", "Kloramfenikol"],
+      answer: 2
+    },
+    {
+      question: "72. Mekanisme kerja obat tetrasiklin:",
+      options: ["Menghambat sintesis protein bakteri 30S", "Menghambat sintesis protein 50S", "Menghambat sintesis dinding sel", "Mengganggu DNA bakteri", "Menghambat metabolisme folat"],
+      answer: 0
+    },
+    {
+      question: "73. Obat yang digunakan sebagai terapi lini pertama hipertensi pada pasien tanpa komorbiditas:",
+      options: ["Propranolol", "Hidroklorotiazid", "Verapamil", "Klonidin", "Minoksidil"],
+      answer: 1
+    },
+    {
+      question: "74. Efek samping khas dari rifampisin:",
+      options: ["Diskrasia darah", "Warna urin menjadi merah jingga", "Hepatotoksisitas berat", "Gangguan pendengaran", "Mual muntah hebat"],
+      answer: 1
+    },
+    {
+      question: "75. Mekanisme kerja metformin:",
+      options: ["Merangsang sekresi insulin", "Menghambat glukoneogenesis", "Menghambat absorpsi glukosa", "Meningkatkan degradasi insulin", "Menghambat metabolisme lemak"],
+      answer: 1
+    },
+    {
+      question: "76. Obat pilihan untuk tinea corporis:",
+      options: ["Asiklovir", "Metronidazol", "Ketokonazol topikal", "Kloramfenikol", "Nistatin"],
+      answer: 2
+    },
+    {
+      question: "77. Antihistamin generasi pertama dapat menyebabkan:",
+      options: ["Pusing", "Sedasi", "Takikardia", "Hipotensi berat", "Konstipasi"],
+      answer: 1
+    },
+    {
+      question: "78. Obat yang paling tepat untuk diare akut akibat infeksi bakteri:",
+      options: ["Loperamid", "Kloramfenikol", "Ringer laktat", "Metronidazol", "ORS dan antibiotik selektif"],
+      answer: 4
+    },
+    {
+      question: "79. Obat yang dikontraindikasikan pada bayi baru lahir:",
+      options: ["Ampisilin", "Kloramfenikol", "Gentamisin", "Seftriakson", "Amoksisilin"],
+      answer: 1
+    },
+    {
+      question: "80. Obat dengan indeks terapi sempit yang memerlukan pemantauan kadar darah:",
+      options: ["Paracetamol", "Amoksisilin", "Teofilin", "Ibuprofen", "Simetidin"],
+      answer: 2
+    },
+    {
+      question: "81. Obat yang umum digunakan untuk profilaksis deep vein thrombosis pascaoperasi:",
+      options: ["Heparin", "Warfarin", "Aspirin", "Tirofiban", "Klopidogrel"],
+      answer: 0
+    },
+    {
+      question: "82. Antibiotik yang bekerja sebagai inhibitor sintesis protein subunit 50S:",
+      options: ["Gentamisin", "Tetrasiklin", "Kloramfenikol", "Siprofloksasin", "Amoksisilin"],
+      answer: 2
+    },
+    {
+      question: "83. Reaksi alergi tipe I ditandai oleh pelepasan:",
+      options: ["Histamin", "Bradikinin", "Interferon", "TNF-α", "IL-6"],
+      answer: 0
+    },
+    {
+      question: "84. Obat yang dikontraindikasikan pada glaukoma sudut sempit:",
+      options: ["Atropin", "Pilokarpin", "Timolol", "Latanoprost", "Brimonidin"],
+      answer: 0
+    },
+    {
+      question: "85. Efek samping utama terapi isotretinoin oral:",
+      options: ["Hipoglikemia", "Hepatotoksisitas", "Hipotensi", "Teratogenik", "Hiperpigmentasi"],
+      answer: 3
+    },
+    {
+      question: "86. Mekanisme kerja omeprazol:",
+      options: ["Antagonis H2", "Inhibitor pompa proton", "Inhibitor enzim COX", "Antasida sistemik", "Antagonis muskarinik"],
+      answer: 1
+    },
+    {
+      question: "87. Pada pasien dengan insufisiensi ginjal kronis, obat yang perlu penyesuaian dosis:",
+      options: ["Aspirin", "Amoksisilin", "Parasetamol", "Loratadin", "Metronidazol"],
+      answer: 1
+    },
+    {
+      question: "88. Antidepresan yang bekerja menghambat reuptake serotonin dan norepinefrin:",
+      options: ["Sertralin", "Fluoksetin", "Amitriptilin", "Buspiron", "Bupropion"],
+      answer: 2
+    },
+    {
+      question: "89. Obat yang digunakan untuk terapi lupus eritematosus sistemik:",
+      options: ["Hidrokortison", "Siklosporin", "Hidroksiklorokuin", "Metotreksat", "Sulfasalazin"],
+      answer: 2
+    },
+    {
+      question: "90. Obat yang bekerja sebagai antagonis kalsium di pembuluh darah perifer:",
+      options: ["Amlodipin", "Verapamil", "Diltiazem", "Digoksin", "Isosorbid dinitrat"],
+      answer: 0
+    },
+    {
+      question: "91. Terapi pilihan pertama pada pasien TB anak adalah:",
+      options: ["2RHZ/4RH", "2HRZE/4HR", "2RHE/4RH", "6HRZE", "2HR/4H"],
+      answer: 1
+    },
+    {
+      question: "92. Obat yang digunakan sebagai penurun tekanan bola mata pada glaukoma sudut terbuka:",
+      options: ["Pilokarpin", "Atropin", "Fenilefrin", "Tropicamid", "Neostigmin"],
+      answer: 0
+    },
+    {
+      question: "93. Obat yang bekerja sebagai antagonis reseptor dopamin D2:",
+      options: ["Haloperidol", "Klorpromazin", "Risperidon", "Metoklopramid", "Semua benar"],
+      answer: 4
+    },
+    {
+      question: "94. Antibiotik yang dapat menyebabkan efek samping gray baby syndrome:",
+      options: ["Amoksisilin", "Kloramfenikol", "Seftriakson", "Siprofloksasin", "Gentamisin"],
+      answer: 1
+    },
+    {
+      question: "95. Sediaan farmasi dengan basis hidrogel yang cocok untuk luka bakar:",
+      options: ["Salep", "Krim", "Gel", "Losion", "Suspensi"],
+      answer: 2
+    },
+    {
+      question: "96. Obat yang digunakan untuk terapi malaria falciparum resisten klorokuin:",
+      options: ["Klorokuin", "Primakuin", "Doksisiklin", "Artemeter-lumefantrin", "Seftriakson"],
+      answer: 3
+    },
+    {
+      question: "97. Fungsi bahan pengawet dalam sediaan farmasi:",
+      options: ["Menambah rasa", "Menstabilkan warna", "Mencegah pertumbuhan mikroba", "Menurunkan viskositas", "Mempercepat pelarutan"],
+      answer: 2
+    },
+    {
+      question: "98. Obat yang memerlukan tes G6PD sebelum pemberian:",
+      options: ["Klorokuin", "Primakuin", "Amoksisilin", "Metronidazol", "Isoniazid"],
+      answer: 1
+    },
+    {
+      question: "99. Obat yang dapat menyebabkan sindrom Steven-Johnson:",
+      options: ["Asetaminofen", "Sefalosporin", "Karbamazepin", "Omeprazol", "Amilorid"],
+      answer: 2
+    },
+    {
+      question: "100. Obat pilihan untuk nyeri berat akibat kanker:",
+      options: ["Kodein", "Tramadol", "Morfin", "Ibuprofen", "Paracetamol"],
+      answer: 2
+    }
+  ];
+
+  let currentQuestion = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+
+  function renderQuestion(index) {
+    document.getElementById('question-text').innerText = questions[index].question;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    questions[index].options.forEach((opt, i) => {
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'option';
+      radio.value = i;
+      radio.checked = userAnswers[index] === i;
+      radio.onclick = () => userAnswers[index] = i;
+
+      const label = document.createElement('label');
+      label.textContent = opt;
+      label.style.display = 'block';
+      label.prepend(radio);
+
+      optionsDiv.appendChild(label);
+    });
+
+    document.querySelectorAll('.navigation button').forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
+    });
+  }
+
+  function renderNavigation() {
+    const nav = document.getElementById('nav');
+    nav.innerHTML = '';
+    questions.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = i + 1;
+      btn.onclick = () => {
+        currentQuestion = i;
+        renderQuestion(currentQuestion);
+      };
+      nav.appendChild(btn);
+    });
+  }
+
+  function prevQuestion() {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      renderQuestion(currentQuestion);
+    }
+  }
+
+  function nextQuestion() {
+    if (currentQuestion < questions.length - 1) {
+      currentQuestion++;
+      renderQuestion(currentQuestion);
+    }
+  }
+
+  function submitAnswers() {
+    let score = 0;
+    questions.forEach((q, i) => {
+      if (userAnswers[i] === q.answer) score++;
+    });
+    const nilai = Math.round((score / questions.length) * 100);
+    document.getElementById('result').innerHTML = `
+      <h3>Skor Anda: ${nilai}</h3>
+      <p>${nilai >= 65 ? '✅ LULUS' : '❌ TIDAK LULUS'} (Minimal 65)</p>
+      <p>Jawaban Benar: ${score} dari ${questions.length}</p>
+    `;
+  }
+
+  // Timer
+  let totalSeconds = 100 * 60;
+  const timer = setInterval(() => {
+    totalSeconds--;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    document.getElementById('timer').innerText = `Sisa Waktu: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (totalSeconds <= 0) {
+      clearInterval(timer);
+      submitAnswers();
+      alert('Waktu habis!');
+    }
+  }, 1000);
+
+  // Inisialisasi
+  renderNavigation();
+  renderQuestion(currentQuestion);
+</script>
+
+</body>
+</html>
